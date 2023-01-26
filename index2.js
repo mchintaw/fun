@@ -15,6 +15,7 @@ import PuppeteerPlugin from 'website-scraper-puppeteer';
                 setTimeout(()=>{
                     reject(new Error("Data fetch failed in "+1000*60*10+" ms"))
                 },1000*60*10);
+                try {
                 let r = await scrape({
                     urls: links[i],
                     directory: `demo/${(new URL(links[i])).hostname}`,
@@ -34,6 +35,10 @@ import PuppeteerPlugin from 'website-scraper-puppeteer';
                 
                 })
                 resolve()
+            }
+            catch (e) {
+                reject(e)
+            }
 
             })
     
