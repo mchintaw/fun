@@ -65,7 +65,7 @@ for (let file of local_files) {
     await page.goto(file)
     await scrollPage(page)
     await page.waitForTimeout(1000);
-    await page.screenshot({path:"2.png",fullPage:true,captureBeyondViewport:true})
+    await page.screenshot({path:path.basename(fileURLToPath(file)).split(".")[1],fullPage:true,captureBeyondViewport:true})
     await page.close()
 }
 
