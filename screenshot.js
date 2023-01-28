@@ -17,7 +17,12 @@ const getLines = async (file) => {
     return lines.map(line=>pathToFileURL(line))
 }
 
-
+//create a directory if it doesn't exist
+const createDir = async (dir) => {
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+    }
+}
 
 // (async () => {
 //     const browser = await puppeteer.launch()
@@ -64,8 +69,10 @@ for (let file of local_files) {
     const page = await browser.newPage()
     await page.goto(file)
     await scrollPage(page)
+    let file_dir = path.dirname(file).split(path.sep).pop()
+    await createDir(path.join(__dirname,"screenshots",file_dir))
     await page.waitForTimeout(1000);
-    await page.screenshot({path:path.join(__dirname,"screenshots",path.basename(fileURLToPath(file)).split(".")[1])+".png",fullPage:true,captureBeyondViewport:true})
+    await page.screenshot({path:path.join(__dirname,"screenshots",file_dir,path.basename(fileURLToPath(file)).split(".")[0])+".png",fullPage:true,captureBeyondViewport:true})
     await page.close()
 }
 
