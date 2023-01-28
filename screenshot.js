@@ -76,15 +76,18 @@ for (let i=0;i<local_files.length;i++){
     let files = local_files.slice(i,i+6);
 
     try {
-        
-        if (fs.existsSync(path.join(__dirname,"screenshots",file_dir,path.basename(fileURLToPath(file)).split(".")[0])+".png"))
-            continue
+
         
         const pages = [await browser.newPage(),await browser.newPage(),await browser.newPage(),await browser.newPage(),await browser.newPage()]
         await Promise.all(files.map(async (file,i)=>{
+            let file_dir = path.dirname(fileURLToPath(file)).split(path.sep).pop()
+            if (fs.existsSync(path.join(__dirname,"screenshots",file_dir,path.basename(fileURLToPath(file)).split(".")[0])+".png")) {
+                console.log("File exists")
+                await pages[i].close()
+                return
+            }
             await pages[i].goto(file)
             await scrollPage(pages[i])
-            let file_dir = path.dirname(fileURLToPath(file)).split(path.sep).pop()
             await createDir(path.join(__dirname,"screenshots",file_dir))
             await pages[i].waitForTimeout(1000);
             await pages[i].screenshot({path:path.join(__dirname,"screenshots",file_dir,path.basename(fileURLToPath(file)).split(".")[0])+".png",fullPage:true,captureBeyondViewport:true})
