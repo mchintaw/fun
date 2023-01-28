@@ -65,7 +65,9 @@ const scrollPage = async (page) => {
 const local_files = await getLines(path.join(__dirname,'demo/list'))
 const browser = await puppeteer.launch()
 
+
 for (let file of local_files) {
+    try {
     const page = await browser.newPage()
     await page.goto(file)
     await scrollPage(page)
@@ -74,6 +76,9 @@ for (let file of local_files) {
     await page.waitForTimeout(1000);
     await page.screenshot({path:path.join(__dirname,"screenshots",file_dir,path.basename(fileURLToPath(file)).split(".")[0])+".png",fullPage:true,captureBeyondViewport:true})
     await page.close()
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 await browser.close();
