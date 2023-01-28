@@ -24,6 +24,12 @@ const createDir = async (dir) => {
     }
 }
 
+// check if file exists
+
+
+
+
+
 // (async () => {
 //     const browser = await puppeteer.launch()
 
@@ -66,16 +72,33 @@ const local_files = await getLines(path.join(__dirname,'demo/list'))
 const browser = await puppeteer.launch()
 
 
-for (let file of local_files) {
+for (let i=0;i<local_files.length;i++){
+    let files = local_files.slice(i,i+6);
+
     try {
-    const page = await browser.newPage()
-    await page.goto(file)
-    await scrollPage(page)
-    let file_dir = path.dirname(fileURLToPath(file)).split(path.sep).pop()
-    await createDir(path.join(__dirname,"screenshots",file_dir))
-    await page.waitForTimeout(1000);
-    await page.screenshot({path:path.join(__dirname,"screenshots",file_dir,path.basename(fileURLToPath(file)).split(".")[0])+".png",fullPage:true,captureBeyondViewport:true})
-    await page.close()
+        
+        if (fs.existsSync(path.join(__dirname,"screenshots",file_dir,path.basename(fileURLToPath(file)).split(".")[0])+".png"))
+            continue
+        
+        const pages = [await browser.newPage(),await browser.newPage(),await browser.newPage(),await browser.newPage(),await browser.newPage()]
+        await Promise.all(files.map(async (file,i)=>{
+            await pages[i].goto(file)
+            await scrollPage(pages[i])
+            let file_dir = path.dirname(fileURLToPath(file)).split(path.sep).pop()
+            await createDir(path.join(__dirname,"screenshots",file_dir))
+            await pages[i].waitForTimeout(1000);
+            await pages[i].screenshot({path:path.join(__dirname,"screenshots",file_dir,path.basename(fileURLToPath(file)).split(".")[0])+".png",fullPage:true,captureBeyondViewport:true})
+            await pages[i].close()
+        }))
+        
+
+        // await page.goto(file)
+        // await scrollPage(page)
+        // let file_dir = path.dirname(fileURLToPath(file)).split(path.sep).pop()
+        // await createDir(path.join(__dirname,"screenshots",file_dir))
+        // await page.waitForTimeout(1000);
+        // await page.screenshot({path:path.join(__dirname,"screenshots",file_dir,path.basename(fileURLToPath(file)).split(".")[0])+".png",fullPage:true,captureBeyondViewport:true})
+        // await page.close()
     } catch (error) {
         console.log(error)
     }
